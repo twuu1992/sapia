@@ -1,3 +1,7 @@
+locals {
+  provider_names = ["FARGATE", "FARGATE_SPOT"]
+}
+
 # Create ECS Cluster
 module "ecs" {
   source = "terraform-aws-modules/ecs/aws"
@@ -22,7 +26,7 @@ module "ecs" {
 # Create the ECS task definition
 resource "aws_ecs_task_definition" "nginx_task" {
   family                   = "nginx-task"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["FARGATE"] # TODO: Add Fargate spot by using capacity provider
   network_mode             = "awsvpc"
   cpu                      = 256
   memory                   = 512
@@ -50,8 +54,8 @@ resource "aws_ecs_service" "nginx" {
   cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.nginx_task.id
   desired_count   = 1
-  iam_role        = aws_iam_role.ecs_role.arn
-  depends_on      = [aws_iam_role_policy.ecs_policy]
+  iam_role        = var.ecs_role_arn
+  depends_on      = [var.ecs_role_policy]
 
   load_balancer {
     target_group_arn = aws_lb_target_group.nginx_http_tg.arn
@@ -61,7 +65,60 @@ resource "aws_ecs_service" "nginx" {
 
   network_configuration {
     assign_public_ip = true
-    security_groups  = [aws_security_group.nginx_http_sg]
-    subnets          = data.aws_subnet_ids.default.ids
+    security_groups  = [var.ecs_sg_id]
+    subnets          = var.subnet_ids
+  }
+}
+
+# Create Capacity Provider for Fargate
+resource "aws_ecs_capacity_provider" "fargate" {
+  name = "fargate_capacity_provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = "" # TODO: Implement auto scaling group
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      maximum_scaling_step_size = 1000
+      minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = 80
+    }
+  }
+}
+
+# Create Capacity Provider for Fargate Spot
+resource "aws_ecs_capacity_provider" "fargate_spot" {
+  name = "fargate_spot_capacity_provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = "" # TODO: Implement auto scaling group
+    managed_termination_protection = "ENABLED"
+
+    managed_scaling {
+      maximum_scaling_step_size = 1000
+      minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = 80
+    }
+  }
+}
+
+# Create Cluster Capacity Provider to link both above
+resource "aws_ecs_cluster_capacity_providers" "cluster_cp" {
+  cluster_name = module.ecs.cluster_name
+
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+  default_capacity_provider_strategy {
+    base              = 1
+    weight            = 50
+    capacity_provider = aws_ecs_capacity_provider.fargate.name
+  }
+
+  default_capacity_provider_strategy {
+    base              = 1
+    weight            = 50
+    capacity_provider = aws_ecs_capacity_provider.fargate_spot.name
   }
 }
