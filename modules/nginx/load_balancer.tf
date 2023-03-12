@@ -26,11 +26,11 @@ resource "aws_lb_target_group" "nginx_http_tg" {
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
   health_check {
-    port = 80
+    port     = 80
     protocol = "HTTP"
     interval = 60
-    timeout = 10
-    path = "/"
+    timeout  = 10
+    path     = "/"
   }
 
   tags = {

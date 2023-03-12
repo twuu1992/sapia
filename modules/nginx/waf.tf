@@ -18,7 +18,7 @@ resource "aws_wafv2_web_acl" "waf_nginx_acl" {
 
     statement {
       rate_based_statement {
-        limit              = 100  # limit per 5 mins, 100 minimum
+        limit              = 100 # limit per 5 mins, 100 minimum
         aggregate_key_type = "IP"
 
         scope_down_statement {
