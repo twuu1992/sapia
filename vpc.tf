@@ -19,8 +19,7 @@ resource "aws_security_group" "nginx_http_sg" {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    cidr_blocks      = [aws_lb.alb_nginx.cidr_blocks]
-    ipv6_cidr_blocks = [aws_lb.alb_nginx.ipv6_cidr_blocks]
+    security_groups = [ aws_security_group.alb_http_sg ]
   }
 
   egress {

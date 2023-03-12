@@ -31,9 +31,15 @@ resource "aws_wafv2_web_acl" "waf_nginx_acl" {
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "nginx-rule-metric"
+      metric_name                = "rate-limit-rule-metric"
       sampled_requests_enabled   = true
     }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "nginx-acl-metric"
+    sampled_requests_enabled   = true
   }
 
   tags = {

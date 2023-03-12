@@ -3,16 +3,16 @@ resource "aws_lb" "alb_nginx" {
   name               = "alb-nginx"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_http_sg.id]
-  subnets            = [data.aws_subnet_ids.default.ids]
+  security_groups    = [var.alb_sg_id]
+  subnets            = var.subnet_ids
 
   enable_deletion_protection = true
 
-  access_logs {
-    bucket  = aws_s3_bucket.lb_logs.id
-    prefix  = "alb_nginx_"
-    enabled = true
-  }
+  # access_logs {
+  #   bucket  = aws_s3_bucket.lb_logs.id
+  #   prefix  = "alb_nginx_"
+  #   enabled = true
+  # }
 
   tags = {
     Name = "alb-nginx"
@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "nginx_http_tg" {
   name     = "tf-nginx-alb-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = data.aws_vpc.default.id
+  vpc_id   = var.vpc_id
   health_check {
     port     = 80
     protocol = "HTTP"
