@@ -15,11 +15,11 @@ resource "aws_security_group" "nginx_http_sg" {
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description      = "Http from alb to nginx ECS Cluster"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    security_groups = [ aws_security_group.alb_http_sg ]
+    description     = "Http from alb to nginx ECS Cluster"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_http_sg]
   }
 
   egress {
