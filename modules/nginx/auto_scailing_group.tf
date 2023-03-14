@@ -97,7 +97,7 @@ resource "aws_autoscaling_group" "ecs_fargate_asg" {
   min_size                  = 1
   desired_capacity          = 1
   launch_template {
-    id = aws_launch_template.ecs_fargate_template
+    id = aws_launch_template.ecs_fargate_template.id
     version = "$Latest"
   }
   health_check_grace_period = 300
@@ -121,7 +121,7 @@ resource "aws_autoscaling_group" "ecs_fargate_spot_asg" {
   min_size                  = 1
   desired_capacity          = 1
   launch_template {
-    id = aws_launch_template.ecs_fargate_spot_template
+    id = aws_launch_template.ecs_fargate_spot_template.id
     version = "$Latest"
   }
   health_check_grace_period = 300

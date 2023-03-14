@@ -19,7 +19,7 @@ resource "aws_security_group" "nginx_http_sg" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_http_sg]
+    security_groups = [aws_security_group.alb_http_sg.id]
   }
 
   egress {
