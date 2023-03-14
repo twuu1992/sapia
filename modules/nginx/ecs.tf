@@ -75,14 +75,14 @@ resource "aws_ecs_capacity_provider" "fargate" {
   name = "fargate_capacity_provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = "" # TODO: Implement auto scaling group
+    auto_scaling_group_arn         = aws_autoscaling_group.ecs_fargate_asg.arn
     managed_termination_protection = "ENABLED"
 
     managed_scaling {
       maximum_scaling_step_size = 1000
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 80
+      target_capacity           = 80  # reach 80% utilization
     }
   }
 }
@@ -92,14 +92,14 @@ resource "aws_ecs_capacity_provider" "fargate_spot" {
   name = "fargate_spot_capacity_provider"
 
   auto_scaling_group_provider {
-    auto_scaling_group_arn         = "" # TODO: Implement auto scaling group
+    auto_scaling_group_arn         = aws_autoscaling_group.ecs_fargate_spot_asg.arn
     managed_termination_protection = "ENABLED"
 
     managed_scaling {
       maximum_scaling_step_size = 1000
       minimum_scaling_step_size = 1
       status                    = "ENABLED"
-      target_capacity           = 80
+      target_capacity           = 80  # reach 80% utilization
     }
   }
 }
@@ -108,7 +108,7 @@ resource "aws_ecs_capacity_provider" "fargate_spot" {
 resource "aws_ecs_cluster_capacity_providers" "cluster_cp" {
   cluster_name = module.ecs.cluster_name
 
-  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+  capacity_providers = local.provider_names
 
   default_capacity_provider_strategy {
     base              = 1
