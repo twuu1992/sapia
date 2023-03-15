@@ -3,8 +3,8 @@ resource "aws_lb" "alb_nginx" {
   name               = "alb-nginx"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.alb_sg_id]
-  subnets            = var.subnet_ids
+  security_groups    = [aws_security_group.alb_http_sg.id]
+  subnets            = data.aws_subnet_ids.default.ids
 
   enable_deletion_protection = true
 
@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "nginx_http_tg" {
   name     = "tf-nginx-alb-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  vpc_id   = data.aws_vpc.default.id
   health_check {
     port     = 80
     protocol = "HTTP"

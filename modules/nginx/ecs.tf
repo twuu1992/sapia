@@ -54,8 +54,8 @@ resource "aws_ecs_service" "nginx" {
   cluster         = module.ecs.cluster_id
   task_definition = aws_ecs_task_definition.nginx_task.id
   desired_count   = 1
-  iam_role        = var.ecs_role_arn
-  depends_on      = [var.ecs_role_policy]
+  iam_role        = aws_iam_role.ecs_role.arn
+  depends_on      = [aws_iam_role_policy.ecs_policy]
 
   load_balancer {
     target_group_arn = aws_lb_target_group.nginx_http_tg.arn
@@ -65,8 +65,8 @@ resource "aws_ecs_service" "nginx" {
 
   network_configuration {
     assign_public_ip = true
-    security_groups  = [var.ecs_sg_id]
-    subnets          = var.subnet_ids
+    security_groups  = [ aws_security_group.nginx_http_sg.id ]
+    subnets          = data.aws_subnet_ids.default.ids
   }
 }
 

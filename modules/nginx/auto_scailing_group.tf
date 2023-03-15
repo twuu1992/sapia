@@ -23,11 +23,11 @@ resource "aws_launch_template" "ecs_fargate_template" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = [var.ecs_sg_id]
-    subnet_id = var.subnet_ids[0]
+    security_groups = [aws_security_group.nginx_http_sg.id]
+    subnet_id = tolist(data.aws_subnet_ids.default.ids)[0]
   }
 
-  vpc_security_group_ids = [var.ecs_sg_id]
+  vpc_security_group_ids = [aws_security_group.nginx_http_sg.id]
 
   tag_specifications {
     resource_type = "instance"
@@ -65,11 +65,11 @@ resource "aws_launch_template" "ecs_fargate_spot_template" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups = [var.ecs_sg_id]
-    subnet_id = var.subnet_ids[0]
+    security_groups = [aws_security_group.nginx_http_sg.id]
+    subnet_id = tolist(data.aws_subnet_ids.default.ids)[0]
   }
 
-  vpc_security_group_ids = [var.ecs_sg_id]
+  vpc_security_group_ids = [aws_security_group.nginx_http_sg.id]
 
   tag_specifications {
     resource_type = "instance"
@@ -104,7 +104,7 @@ resource "aws_autoscaling_group" "ecs_fargate_asg" {
   health_check_type         = "EC2"
   force_delete              = true
 
-  vpc_zone_identifier       = var.subnet_ids
+  vpc_zone_identifier       = data.aws_subnet_ids.default.ids
   target_group_arns = [ aws_lb_target_group.nginx_http_tg.arn ]
 
   tag {
@@ -128,7 +128,7 @@ resource "aws_autoscaling_group" "ecs_fargate_spot_asg" {
   health_check_type         = "EC2"
   force_delete              = true
 
-  vpc_zone_identifier       = var.subnet_ids
+  vpc_zone_identifier       = data.aws_subnet_ids.default.ids
   target_group_arns = [ aws_lb_target_group.nginx_http_tg.arn ]
 
   tag {
