@@ -1,6 +1,6 @@
 module "ecs_nginx" {
   source = "../modules/nginx"
-  
+
   ami_id_asg_template = var.ami_id_asg_template
 }
 

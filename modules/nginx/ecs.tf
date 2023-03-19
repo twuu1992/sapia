@@ -52,6 +52,7 @@ resource "aws_ecs_service" "nginx" {
   desired_count   = 1
   iam_role        = aws_iam_role.ecs_role.arn
   depends_on      = [aws_iam_role_policy.ecs_policy]
+  launch_type     = "FARGATE"
 
   load_balancer {
     target_group_arn = aws_lb_target_group.nginx_http_tg.arn
