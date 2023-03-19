@@ -1,7 +1,3 @@
-locals {
-  provider_names = ["FARGATE", "FARGATE_SPOT"]
-}
-
 # Create ECS Cluster
 module "ecs" {
   source = "terraform-aws-modules/ecs/aws"
@@ -68,6 +64,8 @@ resource "aws_ecs_service" "nginx" {
     security_groups  = [ aws_security_group.nginx_http_sg.id ]
     subnets          = data.aws_subnet_ids.default.ids
   }
+
+  
 }
 
 # Create Capacity Provider for Fargate
@@ -108,7 +106,7 @@ resource "aws_ecs_capacity_provider" "fargate_spot" {
 resource "aws_ecs_cluster_capacity_providers" "cluster_cp" {
   cluster_name = module.ecs.cluster_name
 
-  capacity_providers = local.provider_names
+  capacity_providers = [aws_ecs_capacity_provider.fargate.name, aws_ecs_capacity_provider.fargate_spot.name]
 
   default_capacity_provider_strategy {
     base              = 1
